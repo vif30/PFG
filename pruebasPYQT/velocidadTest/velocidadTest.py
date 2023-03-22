@@ -10,7 +10,42 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
-import irsdk, os
+import irsdk, os, time
+
+class State:
+    ir_connected = False
+    last_car_setup_tick = -1
+
+# here we check if we are connected to iracing
+# so we can retrieve some data
+def check_iracing():
+    if state.ir_connected and not (ir.is_initialized and ir.is_connected):
+        state.ir_connected = False
+        # don't forget to reset your State variables
+        state.last_car_setup_tick = -1
+        # we are shutting down ir library (clearing all internal variables)
+        ir.shutdown()
+        print('irsdk disconnected')
+    elif not state.ir_connected and ir.startup() and ir.is_initialized and ir.is_connected:
+        state.ir_connected = True
+        print('irsdk connected')
+
+# our main loop, where we retrieve data
+# and do something useful with it
+def loop():
+    ir.freeze_var_buffer_latest()
+    t = ir['SessionTime']
+    print('session time:', t)
+    car_setup = ir['CarSetup']
+    if car_setup:
+        car_setup_tick = ir.get_session_info_update_by_key('CarSetup')
+        if car_setup_tick != state.last_car_setup_tick:
+            state.last_car_setup_tick = car_setup_tick
+            print('car setup update count:', car_setup['UpdateCount'])
+            # now you can go to garage, and do some changes with your setup
+            # this line will be printed, only when you change something
+            # and press apply button, but not every 1 sec
+    ir.cam_switch_pos(0, 1)
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -27,23 +62,22 @@ class Ui_Form(object):
         font = QtGui.QFont()
         font.setPointSize(24)
         self.lblVelocidad.setFont(font)
-        self.lblVelocidad.setText("")
+
+        self.lblVelocidad.setText("joder")
         self.lblVelocidad.setObjectName("lblVelocidad")
-        ir = irsdk.IRSDK()
-        ir.startup()
-        stop = True
-        # while stop:
-        #     self.lblVelocidad.setText(str(round(ir['Speed']*3.6, 2)))
-        #     os.system('cls')
-        #     print("Velocidad: ", )
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
+
+
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.label.setText(_translate("Form", "Test de velocidad"))
 
+def getIR():
+    ir = irsdk.IRSDK()
+    print("RPM: ", round(ir['RPM'], 2))
 
 if __name__ == "__main__":
 
@@ -51,6 +85,25 @@ if __name__ == "__main__":
     Form = QtWidgets.QWidget()
     ui = Ui_Form()
     ui.setupUi(Form)
-    Form.show()
+    Form.show()   
+    ir = irsdk.IRSDK()
+    state = State()
+    #ui.lblVelocidad.setText(str(ir['RPM']))
     
+    try:
+        # infinite loop
+        while True:
+            # check if we are connected to iracing
+            check_iracing()
+            # if we are, then process data
+            if state.ir_connected:
+                loop()
+            # sleep for 1 second
+            # maximum you can use is 1/60
+            # cause iracing updates data with 60 fps
+            ui.lblVelocidad.setText(str(ir['RPM']))
+            time.sleep(1)
+    except KeyboardInterrupt:
+        # press ctrl+c to exit
+        pass
     sys.exit(app.exec_())
