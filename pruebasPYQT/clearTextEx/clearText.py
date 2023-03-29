@@ -31,8 +31,9 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.pushButton.setText(_translate("Form", "PushButton"))
-    def b1_clicked():
-        print("Button 1 clicked")
+
+def b1_clicked():
+    print("Button 1 clicked")
 
 
 if __name__ == "__main__":
