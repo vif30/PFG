@@ -184,11 +184,26 @@ class Ui_MainWindow(object):
             
             # Ordena los participantes por su posición en la carrera
             participantes_ordenados = sorted(participantes, key=operator.itemgetter('Position'))
-
+        else:
+            print('No esta abierto iRacing')
 
         #Mostramos los resultados en los label
         def agregar_cero_si_es_necesario(valor):
             return f"{valor:02d}"
+        
+        #Mostrar SOF
+        totaliRating = 0
+        for i in ir['DriverInfo']['Drivers']:
+            totaliRating += [i][0]['IRating']
+        SOF = totaliRating / len(participantes_ordenados)
+        self.lblSOF.setText("SOF: {0:.0f}".format(SOF))
+
+        #Mostrar vehiculo
+        id = ir['DriverInfo']['DriverCarIdx']
+        self.lblCar.setText(ir['DriverInfo']['Drivers'][id]['CarScreenName'])
+
+        #Mostrar Circuito
+        self.lblCircuito.setText(ir['WeekendInfo']['TrackDisplayName'])
         #Participante 1
         self.lblPosition_1.setText(str(participantes_ordenados[0]['Position']))
         self.lblID_1.setText(str(participantes_ordenados[0]['CarIdx']))
