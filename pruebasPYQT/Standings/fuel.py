@@ -203,7 +203,7 @@ class Ui_MainWindow(object):
             participantes = ir['SessionInfo']['Sessions'][0]['ResultsPositions']
             
             # Ordena los participantes por su posición en la carrera
-            participantes_ordenados = sorted(participantes, key=operator.itemgetter('Position'))
+            #participantes_ordenados = sorted(participantes, key=operator.itemgetter('Position'))
         else:
             print('No esta abierto iRacing')
         fuelLevel = ir['FuelLevel']
