@@ -9,7 +9,9 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import irsdk, operator
+from PyQt5.QtCore import QTimer
+import irsdk
+import sqlite3 as sql
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -173,6 +175,12 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+         # Iniciamos el temporizador para actualizar el valor
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.cargarDatos)
+        self.timer.start(1000)  # Actualiza cada 1000 milisegundos (1 segundo)
+
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -189,35 +197,78 @@ class Ui_MainWindow(object):
         self.label_11.setText(_translate("MainWindow", "Fuel at End"))
         self.lblFuelAtEnd.setText(_translate("MainWindow", "1.06"))
     
-    def cargarDatos(self):
-        # Conecta con el simulador
-        ir = irsdk.IRSDK()
-        ir.startup()
-
-        # Obtén los datos del estado de la carrera
-        estado_carrera = ir['SessionState']
-
-        # Verifica si la carrera está activa
-        if estado_carrera == irsdk.SessionState.racing:
-            # Obtén los datos de la posición de los participantes
-            participantes = ir['SessionInfo']['Sessions'][0]['ResultsPositions']
-            
-            # Ordena los participantes por su posición en la carrera
-            #participantes_ordenados = sorted(participantes, key=operator.itemgetter('Position'))
-        else:
-            print('No esta abierto iRacing')
-        fuelLevel = ir['FuelLevel']
-        avgFuel = ir['FuelUsePerHour']
-        #Mostramos combustible actual
-        self.lblFuelLevel.setText("{0:.2f}".format((fuelLevel)))
-        
-        #vueltas totales de carrera si es por tiempo, calcula las vueltas que se hará
-        vueltasTotales = ir['SessionInfo']['Sessions'][0]['SessionLaps']
+    ir = irsdk.IRSDK()
+    ir.startup()
+    playerID = ir['PlayerCarIdx']
+    trackID = ir['WeekendInfo']['TrackID']
+    carID = ir['DriverInfo']['Drivers'][playerID]['CarID']
+    
+    
+    def getVueltas(self):
+        vueltasTotales = self.ir['SessionInfo']['Sessions'][0]['SessionLaps']
         if vueltasTotales == 'unlimited':
-            tiempototal = ir['SessionInfo']['Sessions'][0]['SessionTime'].split(" ")
-            playerID = ir['PlayerCarIdx']
-            #vueltasTotales = float(tiempototal[0]) / ir['SessionInfo']['Sessions'][0]['ResultsPositions'][0]['LastTime']
-        #self.lblLaps.setText(str(vueltasTotales))
+            tiempototal = self.ir['SessionInfo']['Sessions'][0]['SessionTime'].split(" ")
+            vueltasTotales = float(tiempototal[0]) / self.getFastestLapDB(self.carID, self.trackID)
+
+    def getAVGFuelDB(self, IDVehiculo, IDCircuito):
+        conn = sql.connect("iRacing.db")
+        cursor = conn.cursor()
+        query = f"SELECT MediaConsumo FROM VueltaRapida WHERE IDCircuito = {IDCircuito} AND IDVehiculo = {IDVehiculo}"
+        cursor.execute(query)
+        data = cursor.fetchone()
+        conn.commit()
+        conn.close()
+        if(data == None):
+            return 0
+        else:
+            return data[0]
+    #Buscamos en la bbdd la media de consumo por vuelta con el coche y circuito actuales  
+    avgFuel = getAVGFuelDB(carID, trackID)
+
+    def getFastestLapDB(self, IDVehiculo, IDCircuito):
+        conn = sql.connect("iRacing.db")
+        cursor = conn.cursor()
+        query = f"SELECT Tiempo FROM VueltaRapida WHERE IDCircuito = {IDCircuito} AND IDVehiculo = {IDVehiculo}"
+        cursor.execute(query)
+        data = cursor.fetchone()
+        conn.commit()
+        conn.close()
+        if(data == None):
+            return 0
+        else:
+            return data[0]
+        
+    #vueltas totales de carrera si es por tiempo, calcula las vueltas que se hará
+    vueltasTotales = ir['SessionInfo']['Sessions'][0]['SessionLaps']
+    if vueltasTotales == 'unlimited':
+        tiempototal = ir['SessionInfo']['Sessions'][0]['SessionTime'].split(" ")
+        vueltasTotales = float(tiempototal[0]) / getFastestLapDB(carID, trackID)
+    setupUi.lblLaps.setText("{0:.2f}".format((vueltasTotales)))
+
+    def calcularRefuel(self, fuelLevel, fuelConsuption, totalLaps, currentLap):
+        autonomia = fuelLevel / fuelConsuption
+        if autonomia > totalLaps:
+            return 0
+        else:
+            remaining = totalLaps - currentLap
+            if remaining > autonomia:
+                refuel = remaining * fuelConsuption + 1.5
+
+        
+    def cargarDatos(self):
+        fuelLevel = self.ir['FuelLevel']
+        #Mostramos combustible actual
+        self.lblFuelLevel.setText("{0:.2f}".format((self.fuelLevel)))
+
+        if(avgFuel == 0):   #Si no encuentra devuelve 0, por lo que no mostramos por pantalla ningun dato
+            self.lblAverage.setText("--:--")
+            self.lblRemaining.setText("--:--")
+        else:   #Si encuentra valor, mostramos por pantalla 
+            self.lblAverage.setText(str(avgFuel))
+            remainingLaps = fuelLevel / avgFuel
+            self.lblRemaining.setText("{0:.2f}".format((remainingLaps)))
+        
+
         
         #Vueltas restantes con el combustible actual
         avgFuel = 3
@@ -231,4 +282,5 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     ui.cargarDatos()
     MainWindow.show()
+
     sys.exit(app.exec_())
