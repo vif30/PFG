@@ -197,20 +197,14 @@ class Ui_MainWindow(object):
         self.label_11.setText(_translate("MainWindow", "Fuel at End"))
         self.lblFuelAtEnd.setText(_translate("MainWindow", "1.06"))
     
+
     ir = irsdk.IRSDK()
     ir.startup()
     playerID = ir['PlayerCarIdx']
     trackID = ir['WeekendInfo']['TrackID']
-    carID = ir['DriverInfo']['Drivers'][playerID]['CarID']
-    
-    
-    def getVueltas(self):
-        vueltasTotales = self.ir['SessionInfo']['Sessions'][0]['SessionLaps']
-        if vueltasTotales == 'unlimited':
-            tiempototal = self.ir['SessionInfo']['Sessions'][0]['SessionTime'].split(" ")
-            vueltasTotales = float(tiempototal[0]) / self.getFastestLapDB(self.carID, self.trackID)
+    carID = ir['DriverInfo']['Drivers'][playerID]['CarID']    
 
-    def getAVGFuelDB(self, IDVehiculo, IDCircuito):
+    def getAVGFuelDB(IDVehiculo, IDCircuito):
         conn = sql.connect("iRacing.db")
         cursor = conn.cursor()
         query = f"SELECT MediaConsumo FROM VueltaRapida WHERE IDCircuito = {IDCircuito} AND IDVehiculo = {IDVehiculo}"
@@ -225,7 +219,7 @@ class Ui_MainWindow(object):
     #Buscamos en la bbdd la media de consumo por vuelta con el coche y circuito actuales  
     avgFuel = getAVGFuelDB(carID, trackID)
 
-    def getFastestLapDB(self, IDVehiculo, IDCircuito):
+    def getFastestLapDB(IDVehiculo, IDCircuito):
         conn = sql.connect("iRacing.db")
         cursor = conn.cursor()
         query = f"SELECT Tiempo FROM VueltaRapida WHERE IDCircuito = {IDCircuito} AND IDVehiculo = {IDVehiculo}"
@@ -243,35 +237,35 @@ class Ui_MainWindow(object):
     if vueltasTotales == 'unlimited':
         tiempototal = ir['SessionInfo']['Sessions'][0]['SessionTime'].split(" ")
         vueltasTotales = float(tiempototal[0]) / getFastestLapDB(carID, trackID)
-    setupUi.lblLaps.setText("{0:.2f}".format((vueltasTotales)))
 
     def calcularRefuel(self, fuelLevel, fuelConsuption, totalLaps, currentLap):
         autonomia = fuelLevel / fuelConsuption
-        if autonomia > totalLaps:
+        vRestantes = totalLaps - currentLap
+        if autonomia > vRestantes:
             return 0
         else:
-            remaining = totalLaps - currentLap
-            if remaining > autonomia:
-                refuel = remaining * fuelConsuption + 1.5
+            refuel = vRestantes * fuelConsuption + 1.5
+            return refuel
 
         
     def cargarDatos(self):
         fuelLevel = self.ir['FuelLevel']
+        currentLap = self.ir['Lap']
         #Mostramos combustible actual
-        self.lblFuelLevel.setText("{0:.2f}".format((self.fuelLevel)))
+        self.lblFuelLevel.setText("{0:.2f}".format((fuelLevel)))
 
-        if(avgFuel == 0):   #Si no encuentra devuelve 0, por lo que no mostramos por pantalla ningun dato
+        refuel = self.calcularRefuel(fuelLevel, self.avgFuel, self.vueltasTotales, currentLap)
+
+        self.lblRefuel.setText("{0:.2f}".format((refuel)))
+        if(self.avgFuel == 0):   #Si no encuentra devuelve 0, por lo que no mostramos por pantalla ningun dato
             self.lblAverage.setText("--:--")
             self.lblRemaining.setText("--:--")
         else:   #Si encuentra valor, mostramos por pantalla 
-            self.lblAverage.setText(str(avgFuel))
-            remainingLaps = fuelLevel / avgFuel
+            self.lblAverage.setText(str(self.avgFuel))
+            remainingLaps = fuelLevel / self.avgFuel
             self.lblRemaining.setText("{0:.2f}".format((remainingLaps)))
         
-
-        
-        #Vueltas restantes con el combustible actual
-        avgFuel = 3
+        self.lblLaps.setText("{0:.2f}".format((self.vueltasTotales)))
 
 
 if __name__ == "__main__":

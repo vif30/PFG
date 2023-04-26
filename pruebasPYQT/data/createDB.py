@@ -3,13 +3,59 @@ import sqlite3 as sql
 def createTable():
     conn = sql.connect("iRacing.db")
     cursor = conn.cursor()
-    cursor.execute(
-        """INSERT INTO VueltaRapida VALUES
-        (4, 445, 144, 103.663, 2.51)"""
+    cursor.execute("""
+        CREATE TABLE Vehiculos (
+    IDVehiculo INTEGER NOT NULL PRIMARY KEY,
+    Marca TEXT,
+    Modelo TEXT,
+    Categoria TEXT,
+    Consumo REAL,
+    Legacy INTEGER,
+    Comprado INTEGER
+);
+
+CREATE TABLE Circuitos (
+    IDCircuito INTEGER NOT NULL PRIMARY KEY,
+    Nombre TEXT,
+    Pais TEXT,
+    Ciudad TEXT,
+    Longitud TEXT,
+    NVariante INTEGER,
+    Variante TEXT,
+    Legacy INTEGER,
+    Comprado INTEGER
+);
+
+CREATE TABLE VueltaRapida (
+    IDTiempo INTEGER NOT NULL PRIMARY KEY,
+    IDCircuito INTEGER,
+    IDVehiculo INTEGER,
+    Tiempo REAL,
+    MediaConsumo REAL,
+    FOREIGN KEY(IDCircuito) REFERENCES Circuitos(IDCircuito),
+    FOREIGN KEY(IDVehiculo) REFERENCES Vehiculos(IDVehiculo)
+);
+
+CREATE TABLE Series (
+    IDSerie INTEGER NOT NULL PRIMARY KEY,
+    Nombre TEXT,
+    Clase TEXT
+);"""
     )
     conn.commit()
     conn.close()
 
+def dropTable():
+    conn = sql.connect("iRacing.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        """UPDATE Series
+        SET Clase = 'C'
+        WHERE IDSerie = 285
+        """
+    )
+    conn.commit()
+    conn.close()
 def getAVGFuelDB(IDVehiculo, IDCircuito):
     conn = sql.connect("iRacing.db")
     cursor = conn.cursor()
@@ -19,19 +65,6 @@ def getAVGFuelDB(IDVehiculo, IDCircuito):
     conn.commit()
     conn.close()
     print(data[0])
-def dropTable():
-    conn = sql.connect("iRacing.db")
-    cursor = conn.cursor()
-    cursor.execute(
-        """INSERT INTO VueltaRapida VALUES
-        (1, 47, 144, 86.375, 2.19),
-        (2, 95, 144, 126.242, 3.39),
-        (3, 403, 148, 95.500, 0.95),
-        (4, 445, 144, 103.663, 2.51)"""
-    )
-    conn.commit()
-    conn.close()
-
 if __name__ == "__main__":
-    #dropTable()
-    getAVGFuelDB(145, 445)
+    dropTable()
+    #getAVGFuelDB(145, 445)

@@ -1,12 +1,39 @@
-import irsdk
+# import irsdk
 
-""" ir = irsdk.IRSDK()
-ir.startup()
+# ir = irsdk.IRSDK()
+# ir.startup()
 
-car_id = ir['DriverInfo']['Drivers'][0]['CarID']
-print("El ID del vehículo seleccionado es:", car_id)
 
-ir.shutdown() """
+# car_id = ir['SessionInfo']['Sessions'][0]['ResultsPositions'][1]['Time']
+# print( car_id)
 
-minutos, segundos_sobrantes = divmod(float(124.7344), 60)
-print(minutos, segundos_sobrantes)
+# ir.shutdown() 
+
+from PyQt5.QtWidgets import QApplication, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
+
+# Creamos la aplicación
+app = QApplication([])
+
+# Creamos el widget principal
+widget = QWidget()
+
+# Creamos un layout vertical para el widget principal
+layout = QVBoxLayout()
+
+# Creamos el QListWidget y lo añadimos al layout
+list_widget = QListWidget()
+layout.addWidget(list_widget)
+
+# Añadimos elementos al QListWidget
+for i in range(10):
+    item = QListWidgetItem(f"Elemento {i}")
+    list_widget.addItem(item)
+
+# Añadimos el layout al widget principal
+widget.setLayout(layout)
+
+# Mostramos el widget principal
+widget.show()
+
+# Ejecutamos la aplicación
+app.exec_()

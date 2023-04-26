@@ -177,15 +177,13 @@ class Ui_MainWindow(object):
         # Obtén los datos del estado de la carrera
         estado_carrera = ir['SessionState']
 
-        # Verifica si la carrera está activa
-        if estado_carrera == irsdk.SessionState.racing:
+
             # Obtén los datos de la posición de los participantes
-            participantes = ir['SessionInfo']['Sessions'][0]['ResultsPositions']
+        participantes = ir['SessionInfo']['Sessions'][0]['ResultsPositions']
             
             # Ordena los participantes por su posición en la carrera
-            participantes_ordenados = sorted(participantes, key=operator.itemgetter('Position'))
-        else:
-            print('No esta abierto iRacing')
+        participantes_ordenados = sorted(participantes, key=operator.itemgetter('Position'))
+
 
         #Mostramos los resultados en los label
         def agregar_cero_si_es_necesario(valor):
