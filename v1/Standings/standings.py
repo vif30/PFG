@@ -9,7 +9,9 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QApplication, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
+from PyQt5.QtGui import QColor, QBrush
+from PyQt5.QtCore import QTimer, Qt
 import irsdk, operator
 import sqlite3 as sql
 
@@ -67,8 +69,12 @@ class Ui_MainWindow(object):
         self.lblSOF.setObjectName("lblSOF")
         self.horizontalLayout_7.addWidget(self.lblSOF)
         self.verticalLayout.addLayout(self.horizontalLayout_7)
+        font = QtGui.QFont()
+        font.setFamily("Lucida Sans Typewriter")
+        font.setPointSize(16)
         self.lwPosiciones = QtWidgets.QListWidget(self.verticalLayoutWidget)
         self.lwPosiciones.setObjectName("lwPosiciones")
+        self.lwPosiciones.setFont(font)
         self.verticalLayout.addWidget(self.lwPosiciones)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -84,7 +90,7 @@ class Ui_MainWindow(object):
 
          # Iniciamos el temporizador para actualizar el valor
         self.timer = QTimer()
-        self.timer.timeout.connect(self.cargarDatos)
+        self.timer.timeout.connect(self.cargarDatosVariables)
         self.timer.start(1000)  # Actualiza cada 1000 milisegundos (1 segundo)
 
     def retranslateUi(self, MainWindow):
@@ -99,23 +105,107 @@ class Ui_MainWindow(object):
     ir.startup()
     playerID = ir['PlayerCarIdx']
     trackID = ir['WeekendInfo']['TrackID']
-    carID = ir['DriverInfo']['Drivers'][playerID]['CarID']    
+    carID = ir['DriverInfo']['Drivers'][playerID]['CarID']
+    seriesID = ir['WeekendInfo']['SeriesID']
 
-    def getAVGFuelDB(IDVehiculo, IDCircuito):
+    def getCarDB(self):
+            conn = sql.connect("iRacing.db")
+            cursor = conn.cursor()
+            query = f"SELECT Marca, Modelo FROM Vehiculos WHERE IDVehiculo = {self.carID}"
+            cursor.execute(query)
+            data = cursor.fetchone()
+            conn.commit()
+            conn.close()
+            if(data == None):
+                return 0
+            else:
+                return data[0] + " " + data[1]
+    def getSerieDB(self):
+            conn = sql.connect("iRacing.db")
+            cursor = conn.cursor()
+            query = f"SELECT Nombre FROM Series WHERE IDSerie = {self.seriesID}"
+            cursor.execute(query)
+            data = cursor.fetchone()
+            conn.commit()
+            conn.close()
+            if(data == None):
+                return 0
+            else:
+                return data[0]
+    def getCircuitoDB(self):
         conn = sql.connect("iRacing.db")
         cursor = conn.cursor()
-        query = f"SELECT MediaConsumo FROM VueltaRapida WHERE IDCircuito = {IDCircuito} AND IDVehiculo = {IDVehiculo}"
+        query = f"SELECT Nombre FROM Circuitos WHERE IDCircuito = {self.trackID}"
         cursor.execute(query)
         data = cursor.fetchone()
+        if data == None:
+            query2 = f"""INSERT INTO Circuitos (IDCircuito, Nombre, Pais, Ciudad, Longitud, Variante, Comprado) VALUES ({self.trackID}, '{self.ir['WeekendInfo']['TrackDisplayName']}', '{self.ir['WeekendInfo']['TrackCountry']}', '{self.ir['WeekendInfo']['TrackCity']}', '{self.ir['WeekendInfo']['TrackLengthOfficial']}', '{self.ir['WeekendInfo']['TrackConfigName']}', 1)"""
+            cursor.execute(query2)
+            cursor.execute(query)
+            data = cursor.fetchone()
         conn.commit()
         conn.close()
-    
+        if(data == None):
+            return 0
+        else:
+            return data[0]
 
-    def cargarDatos(self):
+    def cargarDatosFijos(self):
+        if Ui_MainWindow.getSerieDB(self) != 0:
+            self.lblSerie.setText(Ui_MainWindow.getSerieDB(self))
+        if Ui_MainWindow.getCarDB(self) != 0:
+            self.lblCar.setText(Ui_MainWindow.getCarDB(self))
+        if Ui_MainWindow.getCircuitoDB(self) != 0:
+            self.lblCircuito.setText(Ui_MainWindow.getCircuitoDB(self))
+        #self.lblSOF.setText(self.ir[])
+
+    def agregar_cero_si_es_necesario(self, valor):
+        return f"{valor:02d}"
+    
+    def convertirVueltas(self, vuelta):
+        minutos, segundos_sobrantes = divmod(float(vuelta), 60)
+        tiempo = self.agregar_cero_si_es_necesario(int(minutos)) + ":{0:.3f}".format(segundos_sobrantes)
+        return tiempo
+
+    def cargarDatosVariables(self):
+        self.lwPosiciones.clear()
     # Obtén los datos de la posición de los participantes
         participantes = self.ir['SessionInfo']['Sessions'][0]['ResultsPositions']
     # Ordena los participantes por su posición en la carrera
-        participantes_ordenados = sorted(participantes, key=operator.itemgetter('Position'))
+        if participantes != None:
+            for i in participantes:
+                posicion = str(i['Position'])
+                while len(posicion) < 5:
+                    posicion += " "
+                nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['UserName']
+                while len(nombre) < 25:
+                    nombre += " "
+                safety = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['LicString']
+                iRating = str(self.ir['DriverInfo']['Drivers'][i['CarIdx']]['IRating'])
+                while len(iRating) < 8:
+                    iRating += " "
+                vRapida = str(i['FastestTime'])
+                vRapida = self.convertirVueltas(vRapida)
+                uVuelta = str(i['LastTime'])
+                uVuelta = self.convertirVueltas(uVuelta)
+                item = QListWidgetItem(posicion + nombre + safety + "    " + iRating + vRapida + "    " + uVuelta)
+                self.lwPosiciones.addItem(item)
+                gris = QColor(189, 195, 199)  # Color gris
+                blanco = QColor(236, 240, 241)  # Color blanco
+                if int(posicion) % 2 == 0:
+                    brush = QBrush(blanco)
+                else:
+                    brush = QBrush(gris)
+                
+                item.setData(Qt.BackgroundRole, brush)
+        else:
+            participantes = self.ir['QualifyResultsInfo']['Results']
+            for i in participantes:
+                nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['UserName']
+                vRapida = nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['FastestTime']
+                uVuelta = nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['LastTime']
+                item = QListWidgetItem(nombre)
+                self.lwPosiciones.addItem(item)
 
         currentLap = self.ir['Lap']
         #Mostramos combustible actual
@@ -128,7 +218,8 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
-    ui.cargarDatos()
+    ui.cargarDatosFijos()
+    ui.cargarDatosVariables()
     MainWindow.show()
 
     sys.exit(app.exec_())
