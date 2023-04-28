@@ -69,6 +69,32 @@ class Ui_MainWindow(object):
         self.lblSOF.setObjectName("lblSOF")
         self.horizontalLayout_7.addWidget(self.lblSOF)
         self.verticalLayout.addLayout(self.horizontalLayout_7)
+        self.lblVueltas.setFont(font)
+        self.lblVueltas.setTextFormat(QtCore.Qt.PlainText)
+        self.lblVueltas.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblVueltas.setObjectName("lblVueltas")
+        self.horizontalLayout_7.addWidget(self.lblVueltas)
+        self.lblTiempo = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.lblTiempo.setMinimumSize(QtCore.QSize(200, 25))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift Light SemiCondensed")
+        font.setPointSize(16)
+        self.lblTiempo.setFont(font)
+        self.lblTiempo.setTextFormat(QtCore.Qt.PlainText)
+        self.lblTiempo.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblTiempo.setObjectName("lblTiempo")
+        self.horizontalLayout_7.addWidget(self.lblTiempo)
+        self.lblTempPista = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.lblTempPista.setMinimumSize(QtCore.QSize(200, 25))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift Light SemiCondensed")
+        font.setPointSize(16)
+        self.lblTempPista.setFont(font)
+        self.lblTempPista.setTextFormat(QtCore.Qt.PlainText)
+        self.lblTempPista.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblTempPista.setObjectName("lblTempPista")
+        self.horizontalLayout_7.addWidget(self.lblTempPista)
+        self.verticalLayout.addLayout(self.horizontalLayout_7)
         font = QtGui.QFont()
         font.setFamily("Lucida Sans Typewriter")
         font.setPointSize(16)
@@ -100,13 +126,21 @@ class Ui_MainWindow(object):
         self.lblCar.setText(_translate("MainWindow", "Audi RS3 LMS"))
         self.lblCircuito.setText(_translate("MainWindow", "Weathertech Laguna Seca"))
         self.lblSOF.setText(_translate("MainWindow", "2000"))
+        self.lblVueltas.setText(_translate("MainWindow", "12 / 24"))
+        self.lblTiempo.setText(_translate("MainWindow", "15:00 / 30:00"))
+        self.lblTempPista.setText(_translate("MainWindow", "36º C"))
     
     ir = irsdk.IRSDK()
-    ir.startup()
-    playerID = ir['PlayerCarIdx']
-    trackID = ir['WeekendInfo']['TrackID']
-    carID = ir['DriverInfo']['Drivers'][playerID]['CarID']
-    seriesID = ir['WeekendInfo']['SeriesID']
+    ir.startup(test_file='data.bin')
+    if ir['PlayerCarIdx']:
+        playerID = ir['PlayerCarIdx']
+    if ir['WeekendInfo']['TrackID']:
+        trackID = ir['WeekendInfo']['TrackID']
+    #if ir['DriverInfo']['Drivers'][playerID]['CarID']:
+    #    carID = ir['DriverInfo']['Drivers'][playerID]['CarID']
+    if ir['WeekendInfo']['SeriesID']:
+        seriesID = ir['WeekendInfo']['SeriesID']
+    print(ir['LapsCompleted'])
 
     def getCarDB(self):
             conn = sql.connect("iRacing.db")
@@ -120,18 +154,18 @@ class Ui_MainWindow(object):
                 return 0
             else:
                 return data[0] + " " + data[1]
-    def getSerieDB(self):
-            conn = sql.connect("iRacing.db")
-            cursor = conn.cursor()
-            query = f"SELECT Nombre FROM Series WHERE IDSerie = {self.seriesID}"
-            cursor.execute(query)
-            data = cursor.fetchone()
-            conn.commit()
-            conn.close()
-            if(data == None):
-                return 0
-            else:
-                return data[0]
+    # def getSerieDB(self):
+    #         conn = sql.connect("iRacing.db")
+    #         cursor = conn.cursor()
+    #         query = f"SELECT Nombre FROM Series WHERE IDSerie = {self.seriesID}"
+    #         cursor.execute(query)
+    #         data = cursor.fetchone()
+    #         conn.commit()
+    #         conn.close()
+    #         if(data == None):
+    #             return 0
+    #         else:
+    #             return data[0]
     def getCircuitoDB(self):
         conn = sql.connect("iRacing.db")
         cursor = conn.cursor()
@@ -151,10 +185,10 @@ class Ui_MainWindow(object):
             return data[0]
 
     def cargarDatosFijos(self):
-        if Ui_MainWindow.getSerieDB(self) != 0:
-            self.lblSerie.setText(Ui_MainWindow.getSerieDB(self))
-        if Ui_MainWindow.getCarDB(self) != 0:
-            self.lblCar.setText(Ui_MainWindow.getCarDB(self))
+        # if Ui_MainWindow.getSerieDB(self) != 0:
+        #     self.lblSerie.setText(Ui_MainWindow.getSerieDB(self))
+        # if Ui_MainWindow.getCarDB(self) != 0:
+        #     self.lblCar.setText(Ui_MainWindow.getCarDB(self))
         if Ui_MainWindow.getCircuitoDB(self) != 0:
             self.lblCircuito.setText(Ui_MainWindow.getCircuitoDB(self))
         #self.lblSOF.setText(self.ir[])
