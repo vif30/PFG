@@ -16,14 +16,14 @@ import irsdk, operator
 import sqlite3 as sql
 
 
-class Ui_MainWindow(object):
+class Standings(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1035, 760)
+        MainWindow.resize(1000, 760)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 1031, 731))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, 1000, 731))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -41,40 +41,54 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addWidget(self.lblSerie)
         self.verticalLayout.addLayout(self.horizontalLayout_6)
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_7.setSpacing(0)
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
         self.lblCar = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.lblCar.adjustSize()
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.lblCar.sizePolicy().hasHeightForWidth())
+        self.lblCar.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Bahnschrift Light SemiCondensed")
-        font.setPointSize(16)
+        font.setPointSize(14)
         self.lblCar.setFont(font)
         self.lblCar.setAlignment(QtCore.Qt.AlignCenter)
         self.lblCar.setObjectName("lblCar")
         self.horizontalLayout_7.addWidget(self.lblCar)
-        self.lblCircuito = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.lblSOF = QtWidgets.QLabel(self.verticalLayoutWidget)
         font = QtGui.QFont()
         font.setFamily("Bahnschrift Light SemiCondensed")
-        font.setPointSize(16)
+        font.setPointSize(14)
+        self.lblSOF.setFont(font)
+        self.lblSOF.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblSOF.setObjectName("lblCircuito")
+        self.lblSOF.adjustSize()
+        self.horizontalLayout_7.addWidget(self.lblSOF)
+        self.lblCircuito = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.lblCircuito.setMinimumSize(QtCore.QSize(200, 25))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift Light SemiCondensed")
+        font.setPointSize(14)
         self.lblCircuito.setFont(font)
         self.lblCircuito.setAlignment(QtCore.Qt.AlignCenter)
-        self.lblCircuito.setObjectName("lblCircuito")
+        self.lblCircuito.setObjectName("lblSOF")
+        self.lblCircuito.adjustSize()
         self.horizontalLayout_7.addWidget(self.lblCircuito)
-        self.lblSOF = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.lblSOF.setMinimumSize(QtCore.QSize(200, 25))
+        self.lblVueltas = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.lblVueltas.setMinimumSize(QtCore.QSize(200, 25))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift Light SemiCondensed")
-        font.setPointSize(16)
-        self.lblSOF.setFont(font)
-        self.lblSOF.setTextFormat(QtCore.Qt.PlainText)
-        self.lblSOF.setAlignment(QtCore.Qt.AlignCenter)
-        self.lblSOF.setObjectName("lblSOF")
-        self.horizontalLayout_7.addWidget(self.lblSOF)
-        self.verticalLayout.addLayout(self.horizontalLayout_7)
+        font.setPointSize(14)
         self.lblVueltas.setFont(font)
         self.lblVueltas.setTextFormat(QtCore.Qt.PlainText)
         self.lblVueltas.setAlignment(QtCore.Qt.AlignCenter)
         self.lblVueltas.setObjectName("lblVueltas")
+        self.lblVueltas.adjustSize()
         self.horizontalLayout_7.addWidget(self.lblVueltas)
         self.lblTiempo = QtWidgets.QLabel(self.verticalLayoutWidget)
+
         self.lblTiempo.setMinimumSize(QtCore.QSize(200, 25))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift Light SemiCondensed")
@@ -83,28 +97,30 @@ class Ui_MainWindow(object):
         self.lblTiempo.setTextFormat(QtCore.Qt.PlainText)
         self.lblTiempo.setAlignment(QtCore.Qt.AlignCenter)
         self.lblTiempo.setObjectName("lblTiempo")
+        self.lblTiempo.adjustSize()
         self.horizontalLayout_7.addWidget(self.lblTiempo)
-        self.lblTempPista = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.lblTempPista.setMinimumSize(QtCore.QSize(200, 25))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift Light SemiCondensed")
-        font.setPointSize(16)
-        self.lblTempPista.setFont(font)
-        self.lblTempPista.setTextFormat(QtCore.Qt.PlainText)
-        self.lblTempPista.setAlignment(QtCore.Qt.AlignCenter)
-        self.lblTempPista.setObjectName("lblTempPista")
-        self.horizontalLayout_7.addWidget(self.lblTempPista)
+        # self.lblTempPista = QtWidgets.QLabel(self.verticalLayoutWidget)
+        # self.lblTempPista.setMinimumSize(QtCore.QSize(200, 25))
+        # font = QtGui.QFont()
+        # font.setFamily("Bahnschrift Light SemiCondensed")
+        # font.setPointSize(16)
+        # self.lblTempPista.setFont(font)
+        # self.lblTempPista.setTextFormat(QtCore.Qt.PlainText)
+        # self.lblTempPista.setAlignment(QtCore.Qt.AlignCenter)
+        # self.lblTempPista.setObjectName("lblTempPista")
+        # self.horizontalLayout_7.addWidget(self.lblTempPista)
         self.verticalLayout.addLayout(self.horizontalLayout_7)
-        font = QtGui.QFont()
         font.setFamily("Lucida Sans Typewriter")
         font.setPointSize(16)
         self.lwPosiciones = QtWidgets.QListWidget(self.verticalLayoutWidget)
         self.lwPosiciones.setObjectName("lwPosiciones")
         self.lwPosiciones.setFont(font)
         self.verticalLayout.addWidget(self.lwPosiciones)
+        #self.lblTempPista.adjustSize()
+        self.verticalLayout.addWidget(self.lwPosiciones)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1035, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1162, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -113,11 +129,10 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-         # Iniciamos el temporizador para actualizar el valor
+        # Iniciamos el temporizador para actualizar el valor
         self.timer = QTimer()
         self.timer.timeout.connect(self.cargarDatosVariables)
-        self.timer.start(1000)  # Actualiza cada 1000 milisegundos (1 segundo)
+        self.timer.start(500)  # Actualiza cada 1000 milisegundos (1 segundo)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -128,18 +143,20 @@ class Ui_MainWindow(object):
         self.lblSOF.setText(_translate("MainWindow", "2000"))
         self.lblVueltas.setText(_translate("MainWindow", "12 / 24"))
         self.lblTiempo.setText(_translate("MainWindow", "15:00 / 30:00"))
-        self.lblTempPista.setText(_translate("MainWindow", "36º C"))
-    
+        #self.lblTempPista.setText(_translate("MainWindow", "36º C"))
+
     ir = irsdk.IRSDK()
-    ir.startup(test_file='data.bin')
+    ir.startup(test_file='datavuelta4.bin')
     if ir['PlayerCarIdx']:
         playerID = ir['PlayerCarIdx']
     if ir['WeekendInfo']['TrackID']:
         trackID = ir['WeekendInfo']['TrackID']
-    #if ir['DriverInfo']['Drivers'][playerID]['CarID']:
-    #    carID = ir['DriverInfo']['Drivers'][playerID]['CarID']
+    if ir['DriverInfo']['Drivers'][playerID]['CarID']:
+        carID = ir['DriverInfo']['Drivers'][playerID]['CarID']
     if ir['WeekendInfo']['SeriesID']:
         seriesID = ir['WeekendInfo']['SeriesID']
+    totalLaps = ir['SessionInfo']['Sessions'][0]['SessionLaps']
+
     print(ir['LapsCompleted'])
 
     def getCarDB(self):
@@ -154,18 +171,18 @@ class Ui_MainWindow(object):
                 return 0
             else:
                 return data[0] + " " + data[1]
-    # def getSerieDB(self):
-    #         conn = sql.connect("iRacing.db")
-    #         cursor = conn.cursor()
-    #         query = f"SELECT Nombre FROM Series WHERE IDSerie = {self.seriesID}"
-    #         cursor.execute(query)
-    #         data = cursor.fetchone()
-    #         conn.commit()
-    #         conn.close()
-    #         if(data == None):
-    #             return 0
-    #         else:
-    #             return data[0]
+    def getSerieDB(self):
+             conn = sql.connect("iRacing.db")
+             cursor = conn.cursor()
+             query = f"SELECT Nombre FROM Series WHERE IDSerie = {self.seriesID}"
+             cursor.execute(query)
+             data = cursor.fetchone()
+             conn.commit()
+             conn.close()
+             if(data == None):
+                 return 0
+             else:
+                 return data[0]
     def getCircuitoDB(self):
         conn = sql.connect("iRacing.db")
         cursor = conn.cursor()
@@ -185,17 +202,27 @@ class Ui_MainWindow(object):
             return data[0]
 
     def cargarDatosFijos(self):
-        # if Ui_MainWindow.getSerieDB(self) != 0:
-        #     self.lblSerie.setText(Ui_MainWindow.getSerieDB(self))
-        # if Ui_MainWindow.getCarDB(self) != 0:
-        #     self.lblCar.setText(Ui_MainWindow.getCarDB(self))
-        if Ui_MainWindow.getCircuitoDB(self) != 0:
-            self.lblCircuito.setText(Ui_MainWindow.getCircuitoDB(self))
-        #self.lblSOF.setText(self.ir[])
+        if Standings.getSerieDB(self) != 0:
+             self.lblSerie.setText(Standings.getSerieDB(self))
+        if Standings.getCarDB(self) != 0:
+             self.lblCar.setText(Standings.getCarDB(self))
+        if Standings.getCircuitoDB(self) != 0:
+            self.lblCircuito.setText(Standings.getCircuitoDB(self))
+        self.lblVueltas.setText(self.totalLaps)
+        if len(self.ir['SessionInfo']['Sessions']) == 3:
+            participantes = self.ir['DriverInfo']['Drivers']
+            totaliR = 0
+            for i in participantes:
+                if i['CarIdx'] == 0:
+                    pass
+                else:
+                    totaliR += i['IRating']
+            self.lblSOF.setText(str(totaliR / (len(participantes) - 1)))
+
 
     def agregar_cero_si_es_necesario(self, valor):
         return f"{valor:02d}"
-    
+
     def convertirVueltas(self, vuelta):
         minutos, segundos_sobrantes = divmod(float(vuelta), 60)
         tiempo = self.agregar_cero_si_es_necesario(int(minutos)) + ":{0:.3f}".format(segundos_sobrantes)
@@ -203,16 +230,31 @@ class Ui_MainWindow(object):
 
     def cargarDatosVariables(self):
         self.lwPosiciones.clear()
-    # Obtén los datos de la posición de los participantes
-        participantes = self.ir['SessionInfo']['Sessions'][0]['ResultsPositions']
+    # Obtén los datos de la posición de los participantes comprobando en que sesion estamos
+        if len(self.ir['SessionInfo']['Sessions']) == 3:
+            participantes = self.ir['SessionInfo']['Sessions'][2]['ResultsPositions']
+        elif len(self.ir['SessionInfo']['Sessions']) == 2:
+            participantes = self.ir['SessionInfo']['Sessions'][1]['ResultsPositions']
+        elif len(self.ir['SessionInfo']['Sessions']) == 1:
+            participantes = self.ir['SessionInfo']['Sessions'][0]['ResultsPositions']
+        else:
+            participantes = None
+          #SessionLaps 
+        tTotal = self.ir['SessionInfo']['Sessions'][0]['SessionTime']
+        tTotal = tTotal.split()
+        tTotal = self.convertirVueltas(tTotal[0])
+        tTranscurrido = self.convertirVueltas(self.ir['SessionTime'])
+        self.lblTiempo.setText(str(tTranscurrido) + " / " + str(tTotal))
     # Ordena los participantes por su posición en la carrera
         if participantes != None:
             for i in participantes:
                 posicion = str(i['Position'])
-                while len(posicion) < 5:
+                while len(posicion) < 5:    #Añadimos espacios detras de posicion
                     posicion += " "
-                nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['UserName']
-                while len(nombre) < 25:
+                nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['AbbrevName']
+                if nombre == "":
+                    nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['UserName']
+                while len(nombre) < 17:
                     nombre += " "
                 safety = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['LicString']
                 iRating = str(self.ir['DriverInfo']['Drivers'][i['CarIdx']]['IRating'])
@@ -232,25 +274,18 @@ class Ui_MainWindow(object):
                     brush = QBrush(gris)
                 
                 item.setData(Qt.BackgroundRole, brush)
-        else:
-            participantes = self.ir['QualifyResultsInfo']['Results']
-            for i in participantes:
-                nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['UserName']
-                vRapida = nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['FastestTime']
-                uVuelta = nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['LastTime']
-                item = QListWidgetItem(nombre)
-                self.lwPosiciones.addItem(item)
+        #else:
 
         currentLap = self.ir['Lap']
         #Mostramos combustible actual
-        
+    
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
+    ui = Standings()
     ui.setupUi(MainWindow)
     ui.cargarDatosFijos()
     ui.cargarDatosVariables()
