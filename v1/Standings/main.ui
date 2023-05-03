@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>290</y>
+      <x>320</x>
+      <y>360</y>
       <width>131</width>
       <height>51</height>
      </rect>
@@ -36,8 +36,8 @@
    <widget class="QLabel" name="lblBienvenida">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>40</y>
+      <x>150</x>
+      <y>110</y>
       <width>481</width>
       <height>91</height>
      </rect>
@@ -53,10 +53,13 @@
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_3">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>200</y>
+      <x>320</x>
+      <y>270</y>
       <width>131</width>
       <height>51</height>
      </rect>
@@ -69,6 +72,31 @@
     </property>
     <property name="text">
      <string>Standings</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblEstado">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>560</x>
+      <y>30</y>
+      <width>211</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Bahnschrift Light SemiCondensed</family>
+      <pointsize>16</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="text">
+     <string>iRacing esta preparado</string>
     </property>
    </widget>
   </widget>

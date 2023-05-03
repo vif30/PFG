@@ -199,7 +199,7 @@ class Fuel(object):
     
 
     ir = irsdk.IRSDK()
-    ir.startup()#test_file='datavuelta2.bin')
+    ir.startup(test_file='datavuelta4.bin')
     playerID = ir['PlayerCarIdx']
     trackID = ir['WeekendInfo']['TrackID']
     carID = ir['DriverInfo']['Drivers'][playerID]['CarID']    

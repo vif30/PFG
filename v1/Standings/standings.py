@@ -145,8 +145,10 @@ class Standings(object):
         self.lblTiempo.setText(_translate("MainWindow", "15:00 / 30:00"))
         #self.lblTempPista.setText(_translate("MainWindow", "36º C"))
 
+    gris = QColor(189, 195, 199)  # Color gris
+    blanco = QColor(236, 240, 241)  # Color blanco
     ir = irsdk.IRSDK()
-    ir.startup(test_file='datavuelta4.bin')
+    ir.startup(test_file='datavuelta10.bin')
     if ir['PlayerCarIdx']:
         playerID = ir['PlayerCarIdx']
     if ir['WeekendInfo']['TrackID']:
@@ -157,8 +159,7 @@ class Standings(object):
         seriesID = ir['WeekendInfo']['SeriesID']
     totalLaps = ir['SessionInfo']['Sessions'][0]['SessionLaps']
 
-    print(ir['LapsCompleted'])
-
+    #Metodo para obtener el vehiculo de la bbdd
     def getCarDB(self):
             conn = sql.connect("iRacing.db")
             cursor = conn.cursor()
@@ -171,6 +172,8 @@ class Standings(object):
                 return 0
             else:
                 return data[0] + " " + data[1]
+    
+    #Metodo para obtener el nombre de la Serie de la bbdd
     def getSerieDB(self):
              conn = sql.connect("iRacing.db")
              cursor = conn.cursor()
@@ -183,6 +186,8 @@ class Standings(object):
                  return 0
              else:
                  return data[0]
+    
+    #Metodo para obetner el nombre del circuito de la bbdd, sino lo encuentra, lo añade a la bbdd
     def getCircuitoDB(self):
         conn = sql.connect("iRacing.db")
         cursor = conn.cursor()
@@ -200,15 +205,31 @@ class Standings(object):
             return 0
         else:
             return data[0]
+    
+    #Metodo para obtener la vuelta rapida de la bbdd
+    def getVueltaRapidaDB(self):
+        conn = sql.connect("iRacing.db")
+        cursor = conn.cursor()
+        query = f"SELECT Tiempo FROM VueltaRapida WHERE IDCircuito = {self.trackID} AND IDVehiculo = {self.carID}"
+        cursor.execute(query)
+        data = cursor.fetchone()
+        conn.commit()
+        conn.close()
+        if(data == None):
+            return 0
+        else:
+            return data[0]
 
+    #Metodo para cargar los datos que son fijos durante toda la carrera
     def cargarDatosFijos(self):
-        if Standings.getSerieDB(self) != 0:
+        if Standings.getSerieDB(self) != 0:     #Buscamos el nombre de la serie en la bbdd
              self.lblSerie.setText(Standings.getSerieDB(self))
-        if Standings.getCarDB(self) != 0:
+        if Standings.getCarDB(self) != 0:       #Buscamos el nombre del coche en la bbdd
              self.lblCar.setText(Standings.getCarDB(self))
-        if Standings.getCircuitoDB(self) != 0:
+        if Standings.getCircuitoDB(self) != 0:  #Buscamos el nombre del circuito en la bbdd
             self.lblCircuito.setText(Standings.getCircuitoDB(self))
-        self.lblVueltas.setText(self.totalLaps)
+
+        #Calculo del SOF de la partida, esto solo se calcula cuando la sesion es del tipo RACE
         if len(self.ir['SessionInfo']['Sessions']) == 3:
             participantes = self.ir['DriverInfo']['Drivers']
             totaliR = 0
@@ -217,66 +238,95 @@ class Standings(object):
                     pass
                 else:
                     totaliR += i['IRating']
-            self.lblSOF.setText(str(totaliR / (len(participantes) - 1)))
+            self.lblSOF.setText("{0:.0f}".format(totaliR / (len(participantes) - 1)))
 
-
-    def agregar_cero_si_es_necesario(self, valor):
+    #Metodo para añadir cero delante de los segundos si hay de 0 a 9 segundos
+    def agregar_cero_si_es_necesario(self, valor):      
         return f"{valor:02d}"
 
-    def convertirVueltas(self, vuelta):
+    #Metodo para convertir el tiempo de vuelta(segundos) en un string mm:ss:ms
+    def convertirVueltas(self, vuelta):     
         minutos, segundos_sobrantes = divmod(float(vuelta), 60)
         tiempo = self.agregar_cero_si_es_necesario(int(minutos)) + ":{0:.3f}".format(segundos_sobrantes)
         return tiempo
 
+    #Metodo para cargar los datos varian durante la carrera
     def cargarDatosVariables(self):
         self.lwPosiciones.clear()
+        sesion = 0
     # Obtén los datos de la posición de los participantes comprobando en que sesion estamos
         if len(self.ir['SessionInfo']['Sessions']) == 3:
             participantes = self.ir['SessionInfo']['Sessions'][2]['ResultsPositions']
+            sesion = 2
         elif len(self.ir['SessionInfo']['Sessions']) == 2:
             participantes = self.ir['SessionInfo']['Sessions'][1]['ResultsPositions']
+            sesion = 1
         elif len(self.ir['SessionInfo']['Sessions']) == 1:
             participantes = self.ir['SessionInfo']['Sessions'][0]['ResultsPositions']
+            sesion = 0
         else:
             participantes = None
-          #SessionLaps 
-        tTotal = self.ir['SessionInfo']['Sessions'][0]['SessionTime']
+        #Tiempo de sesion
+        tTotal = self.ir['SessionInfo']['Sessions'][sesion]['SessionTime']
         tTotal = tTotal.split()
-        tTotal = self.convertirVueltas(tTotal[0])
+        tTotalFrm = self.convertirVueltas(tTotal[0])
+        tTotal = float(tTotal[0])
+        
         tTranscurrido = self.convertirVueltas(self.ir['SessionTime'])
-        self.lblTiempo.setText(str(tTranscurrido) + " / " + str(tTotal))
+        self.lblTiempo.setText(str(tTranscurrido) + " / " + str(tTotalFrm))
+
+        #Calculo vueltas de carrera
+        if self.ir['SessionInfo']['Sessions'][sesion]['SessionLaps'] ==  'unlimited':
+            if Standings.getVueltaRapidaDB(self) != 0:
+                vRapida = Standings.getVueltaRapidaDB(self)
+                vTotales = tTotal/vRapida
+            else:
+                estLap = self.ir['DriverInfo']['Drivers'][self.playerID]['CarClassEstLapTime']
+                vTotales = tTotal/estLap
+        else:
+            vTotales = self.ir['SessionInfo']['Sessions'][sesion]
+        self.lblVueltas.setText(str(self.ir['Lap']) + "/" + "{0:.2f}".format((vTotales)) )        
+
     # Ordena los participantes por su posición en la carrera
         if participantes != None:
-            for i in participantes:
+            for i in participantes:                
                 posicion = str(i['Position'])
-                while len(posicion) < 5:    #Añadimos espacios detras de posicion
+                #Añadimos espacios detras de posicion para separarlo del resto del string
+                while len(posicion) < 5:    
                     posicion += " "
+
+                #Añadimos el nombre del piloto, en caso de no tener nombre abreviado, añadimos el nombre completo
                 nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['AbbrevName']
                 if nombre == "":
                     nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['UserName']
+                
+                #Añadimos espeacios en blanco detras
                 while len(nombre) < 17:
                     nombre += " "
                 safety = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['LicString']
                 iRating = str(self.ir['DriverInfo']['Drivers'][i['CarIdx']]['IRating'])
+                #Añadimos espeacios en blanco detras
                 while len(iRating) < 8:
                     iRating += " "
                 vRapida = str(i['FastestTime'])
                 vRapida = self.convertirVueltas(vRapida)
                 uVuelta = str(i['LastTime'])
                 uVuelta = self.convertirVueltas(uVuelta)
+
+                #Añadimos todos los datos del piloto al QlistWidget y mostramos por pantalla
                 item = QListWidgetItem(posicion + nombre + safety + "    " + iRating + vRapida + "    " + uVuelta)
                 self.lwPosiciones.addItem(item)
-                gris = QColor(189, 195, 199)  # Color gris
-                blanco = QColor(236, 240, 241)  # Color blanco
+                
+                #Pintamos
+
                 if int(posicion) % 2 == 0:
-                    brush = QBrush(blanco)
+                    brush = QBrush(self.blanco)
                 else:
-                    brush = QBrush(gris)
+                    brush = QBrush(self.gris)
                 
                 item.setData(Qt.BackgroundRole, brush)
         #else:
 
-        currentLap = self.ir['Lap']
         #Mostramos combustible actual
     
 

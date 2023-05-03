@@ -199,7 +199,7 @@ class Ui_MainWindow(object):
     
 
     ir = irsdk.IRSDK()
-    ir.startup()
+    ir.startup(test_file='carreraBots.bin')
     playerID = ir['PlayerCarIdx']
     trackID = ir['WeekendInfo']['TrackID']
     carID = ir['DriverInfo']['Drivers'][playerID]['CarID']    

@@ -9,9 +9,10 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QTimer
 from standings import Standings
 from fuel import Fuel
-
+import irsdk, time
 
 class Main(object):
     def setupUi(self, MainWindow):
@@ -53,6 +54,10 @@ class Main(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        # Iniciamos el temporizador para actualizar el valor
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.checkiRacing)
+        self.timer.start(1000)  # Actualiza cada 1000 milisegundos (1 segundo)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -73,11 +78,26 @@ class Main(object):
         self.ui2.setupUi(self.ventana2)
         self.ventana2.show()
 
+    def checkiRacing(self):
+        ir = irsdk.IRSDK()
+        ir.startup(test_file='datavuelta4.bin')
+        if ir.is_connected:
+            self.btnFuel.setStyleSheet('background-color: green')
+            self.btnStandings.setStyleSheet('background-color: green')
+        else:
+            self.btnFuel.setStyleSheet('background-color: red')
+            self.btnStandings.setStyleSheet('background-color: red')
+
+        ir.shutdown()
+    
+
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Main()
     ui.setupUi(MainWindow)
+    ui.checkiRacing()
     MainWindow.show()
     sys.exit(app.exec_())
