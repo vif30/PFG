@@ -1,18 +1,12 @@
-import sqlite3
+import sqlite3 as sql
 
 # Establecer la conexión con la base de datos
-conn = sqlite3.connect('iRacing.db')
-
-# Crear un objeto Cursor
+conn = sql.connect("C:/Users/izqui/Documents/GitHub/PFG/v3/data/iRacing.db")
 cursor = conn.cursor()
-
-# Leer el contenido del archivo SQL
-with open('data.sql', 'r') as archivo:
-    contenido = archivo.read()
-
-# Ejecutar el script SQL
-cursor.executescript(contenido)
-
-# Guardar los cambios y cerrar la conexión
+#query = f"INSERT INTO VueltaRapida (IDCircuito, IDVehiculo, MediaConsumo) VALUES ({self.trackID}, {self.carID}, {self.avgFuel}"
+query2 = f"SELECT COUNT(*) FROM VueltaRapida"
+cursor.execute(query2)
+data = cursor.fetchone()
 conn.commit()
 conn.close()
+print(data[0])
