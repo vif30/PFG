@@ -39,8 +39,13 @@ class Standings(object):
         self.lblSerie.setFont(font)
         self.lblSerie.setAlignment(QtCore.Qt.AlignCenter)
         self.lblSerie.setObjectName("lblSerie")
-        self.horizontalLayout_6.addWidget(self.lblSerie, 0, QtCore.Qt.AlignHCenter)
+        self.horizontalLayout_6.addWidget(self.lblSerie)
+        self.verticalLayout.addLayout(self.horizontalLayout_6)
+        self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_7.setSpacing(0)
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
         self.lblCar = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.lblCar.adjustSize()
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -48,44 +53,43 @@ class Standings(object):
         self.lblCar.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setFamily("Bahnschrift Light SemiCondensed")
-        font.setPointSize(16)
+        font.setPointSize(14)
         self.lblCar.setFont(font)
         self.lblCar.setAlignment(QtCore.Qt.AlignCenter)
         self.lblCar.setObjectName("lblCar")
-        self.horizontalLayout_6.addWidget(self.lblCar, 0, QtCore.Qt.AlignHCenter)
-        self.verticalLayout.addLayout(self.horizontalLayout_6)
-        self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_7.setSpacing(0)
-        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
-        self.lblCircuito = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.horizontalLayout_7.addWidget(self.lblCar)
+        self.lblSOF = QtWidgets.QLabel(self.verticalLayoutWidget)
         font = QtGui.QFont()
         font.setFamily("Bahnschrift Light SemiCondensed")
-        font.setPointSize(16)
+        font.setPointSize(14)
+        self.lblSOF.setFont(font)
+        self.lblSOF.setAlignment(QtCore.Qt.AlignCenter)
+        self.lblSOF.setObjectName("lblCircuito")
+        self.lblSOF.adjustSize()
+        self.horizontalLayout_7.addWidget(self.lblSOF)
+        self.lblCircuito = QtWidgets.QLabel(self.verticalLayoutWidget)
+        self.lblCircuito.setMinimumSize(QtCore.QSize(200, 25))
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift Light SemiCondensed")
+        font.setPointSize(14)
         self.lblCircuito.setFont(font)
         self.lblCircuito.setAlignment(QtCore.Qt.AlignCenter)
-        self.lblCircuito.setObjectName("lblCircuito")
+        self.lblCircuito.setObjectName("lblSOF")
+        self.lblCircuito.adjustSize()
         self.horizontalLayout_7.addWidget(self.lblCircuito)
-        self.lblSOF = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.lblSOF.setMinimumSize(QtCore.QSize(200, 25))
-        font = QtGui.QFont()
-        font.setFamily("Bahnschrift Light SemiCondensed")
-        font.setPointSize(16)
-        self.lblSOF.setFont(font)
-        self.lblSOF.setTextFormat(QtCore.Qt.PlainText)
-        self.lblSOF.setAlignment(QtCore.Qt.AlignCenter)
-        self.lblSOF.setObjectName("lblSOF")
-        self.horizontalLayout_7.addWidget(self.lblSOF)
         self.lblVueltas = QtWidgets.QLabel(self.verticalLayoutWidget)
         self.lblVueltas.setMinimumSize(QtCore.QSize(200, 25))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift Light SemiCondensed")
-        font.setPointSize(16)
+        font.setPointSize(14)
         self.lblVueltas.setFont(font)
         self.lblVueltas.setTextFormat(QtCore.Qt.PlainText)
         self.lblVueltas.setAlignment(QtCore.Qt.AlignCenter)
         self.lblVueltas.setObjectName("lblVueltas")
+        self.lblVueltas.adjustSize()
         self.horizontalLayout_7.addWidget(self.lblVueltas)
         self.lblTiempo = QtWidgets.QLabel(self.verticalLayoutWidget)
+
         self.lblTiempo.setMinimumSize(QtCore.QSize(200, 25))
         font = QtGui.QFont()
         font.setFamily("Bahnschrift Light SemiCondensed")
@@ -94,23 +98,26 @@ class Standings(object):
         self.lblTiempo.setTextFormat(QtCore.Qt.PlainText)
         self.lblTiempo.setAlignment(QtCore.Qt.AlignCenter)
         self.lblTiempo.setObjectName("lblTiempo")
-        self.horizontalLayout_7.addWidget(self.lblTiempo, 0, QtCore.Qt.AlignHCenter)
-        self.lblIncidentes = QtWidgets.QLabel(self.verticalLayoutWidget)
-        self.lblIncidentes.setMinimumSize(QtCore.QSize(200, 25))
-        font = QtGui.QFont()
+        self.lblTiempo.adjustSize()
+        self.horizontalLayout_7.addWidget(self.lblTiempo)
+        # self.lblTempPista = QtWidgets.QLabel(self.verticalLayoutWidget)
+        # self.lblTempPista.setMinimumSize(QtCore.QSize(200, 25))
+        # font = QtGui.QFont()
+        # font.setFamily("Bahnschrift Light SemiCondensed")
+        # font.setPointSize(16)
+        # self.lblTempPista.setFont(font)
+        # self.lblTempPista.setTextFormat(QtCore.Qt.PlainText)
+        # self.lblTempPista.setAlignment(QtCore.Qt.AlignCenter)
+        # self.lblTempPista.setObjectName("lblTempPista")
+        # self.horizontalLayout_7.addWidget(self.lblTempPista)
+        self.verticalLayout.addLayout(self.horizontalLayout_7)
         font.setFamily("Bahnschrift Light SemiCondensed")
         font.setPointSize(16)
-        self.lblIncidentes.setFont(font)
-        self.lblIncidentes.setTextFormat(QtCore.Qt.PlainText)
-        self.lblIncidentes.setAlignment(QtCore.Qt.AlignCenter)
-        self.lblIncidentes.setObjectName("lblIncidentes")
-        self.horizontalLayout_7.addWidget(self.lblIncidentes)
-        self.verticalLayout.addLayout(self.horizontalLayout_7)
         self.lwPosiciones = QtWidgets.QListWidget(self.verticalLayoutWidget)
         self.lwPosiciones.setObjectName("lwPosiciones")
-        font.setFamily("Lucida Sans Typewriter")
-        font.setPointSize(18)
         self.lwPosiciones.setFont(font)
+        self.verticalLayout.addWidget(self.lwPosiciones)
+        #self.lblTempPista.adjustSize()
         self.verticalLayout.addWidget(self.lwPosiciones)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -137,12 +144,12 @@ class Standings(object):
         self.lblSOF.setText(_translate("MainWindow", "2000"))
         self.lblVueltas.setText(_translate("MainWindow", "12 / 24"))
         self.lblTiempo.setText(_translate("MainWindow", "15:00 / 30:00"))
-        self.lblIncidentes.setText(_translate("MainWindow", "7/17"))
+        #self.lblTempPista.setText(_translate("MainWindow", "36º C"))
 
     gris = QColor(189, 195, 199)  # Color gris
     blanco = QColor(236, 240, 241)  # Color blanco
     ir = irsdk.IRSDK()
-    ir.startup()#test_file='datavuelta4.bin')
+    ir.startup(test_file='datavuelta4.bin')
     Database = Database()
     if ir.is_connected:
         playerID = ir['PlayerCarIdx']
@@ -152,10 +159,7 @@ class Standings(object):
             carID = ir['DriverInfo']['Drivers'][playerID]['CarID']
         if ir['WeekendInfo']['SeriesID']:
             seriesID = ir['WeekendInfo']['SeriesID']
-        else:
-            seriesID = 0
         totalLaps = ir['SessionInfo']['Sessions'][0]['SessionLaps']
-        maxIncidents = ir['WeekendInfo']['WeekendOptions']['IncidentLimit']
 
     
     #Metodo para cargar los datos que son fijos durante toda la carrera
@@ -179,7 +183,7 @@ class Standings(object):
                     pass
                 else:
                     totaliR += i['IRating']
-            self.lblSOF.setText("SOF: " + "{0:.0f}".format(totaliR / (len(participantes) - 1)))
+            self.lblSOF.setText("{0:.0f}".format(totaliR / (len(participantes) - 1)))
 
     #Metodo para añadir cero delante de los segundos si hay de 0 a 9 segundos
     def agregar_cero_si_es_necesario(self, valor):      
@@ -190,10 +194,6 @@ class Standings(object):
         minutos, segundos_sobrantes = divmod(float(vuelta), 60)
         tiempo = self.agregar_cero_si_es_necesario(int(minutos)) + ":{0:.3f}".format(segundos_sobrantes)
         return tiempo
-    def convertirTiempo(self, vuelta):     
-        minutos, segundos_sobrantes = divmod(float(vuelta), 60)
-        tiempo = self.agregar_cero_si_es_necesario(int(minutos)) + ":" + self.agregar_cero_si_es_necesario(int(segundos_sobrantes))
-        return tiempo
 
     #Metodo para cargar los datos varian durante la carrera
     def cargarDatosVariables(self):
@@ -203,29 +203,22 @@ class Standings(object):
         if len(self.ir['SessionInfo']['Sessions']) == 3:
             participantes = self.ir['SessionInfo']['Sessions'][2]['ResultsPositions']
             sesion = 2
-            sesionName = "Race: "
         elif len(self.ir['SessionInfo']['Sessions']) == 2:
             participantes = self.ir['SessionInfo']['Sessions'][1]['ResultsPositions']
             sesion = 1
-            sesionName = "Qualify: "
         elif len(self.ir['SessionInfo']['Sessions']) == 1:
             participantes = self.ir['SessionInfo']['Sessions'][0]['ResultsPositions']
             sesion = 0
-            sesionName = "Practice: "
         else:
             participantes = None
         #Tiempo de sesion
         tTotal = self.ir['SessionInfo']['Sessions'][sesion]['SessionTime']
         tTotal = tTotal.split()
-        tTotalFrm = self.convertirTiempo(tTotal[0])
+        tTotalFrm = self.convertirVueltas(tTotal[0])
         tTotal = float(tTotal[0])
         
-        tTranscurrido = self.convertirTiempo(self.ir['SessionTime'])
-        tRestante = self.convertirTiempo(self.ir['SessionTimeRemain'])
-        if tRestante == '-1:59':
-            self.lblTiempo.setText(sesionName + str(tTranscurrido) + " / " + str(tTotalFrm))
-        else:
-            self.lblTiempo.setText(sesionName + str(tRestante) + " / " + str(tTotalFrm))
+        tTranscurrido = self.convertirVueltas(self.ir['SessionTime'])
+        self.lblTiempo.setText(str(tTranscurrido) + " / " + str(tTotalFrm))
 
         #Calculo vueltas de carrera
         if self.ir['SessionInfo']['Sessions'][sesion]['SessionLaps'] ==  'unlimited':
@@ -237,13 +230,7 @@ class Standings(object):
                 vTotales = tTotal/estLap
         else:
             vTotales = self.ir['SessionInfo']['Sessions'][sesion]['SessionLaps']
-        self.lblVueltas.setText("Lap: " + str(self.ir['Lap']) + "/" + "{0:.2f}".format((vTotales)) )      
-
-        myIncidents = self.ir['PlayerCarMyIncidentCount']
-        if self.maxIncidents == 'unlimited':
-            self.lblIncidentes.setText("X " + str(myIncidents))
-        else:
-            self.lblIncidentes.setText("X " + str(myIncidents) + "/" + str(self.maxIncidents))
+        self.lblVueltas.setText(str(self.ir['Lap']) + "/" + "{0:.2f}".format((vTotales)) )        
 
     # Ordena los participantes por su posición en la carrera
         if participantes != None:
@@ -251,7 +238,7 @@ class Standings(object):
                 posicion = str(i['Position'])
                 #Añadimos espacios detras de posicion para separarlo del resto del string
                 while len(posicion) < 5:    
-                    posicion += " "
+                    posicion += "  "
 
                 #Añadimos el nombre del piloto, en caso de no tener nombre abreviado, añadimos el nombre completo
                 nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['AbbrevName']
@@ -259,7 +246,7 @@ class Standings(object):
                     nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['UserName']
                 
                 #Añadimos espeacios en blanco detras
-                while len(nombre) < 20:
+                while len(nombre) < 17:
                     nombre += " "
                 safety = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['LicString']
                 iRating = str(self.ir['DriverInfo']['Drivers'][i['CarIdx']]['IRating'])
@@ -269,7 +256,7 @@ class Standings(object):
 
                 #Comprobamos si la vuelta rapida o la ultima vuelta del piloto son nulas, si es asi lo deja en blanco.
                 if i['FastestTime'] == -1.0:
-                    vRapida = ""
+                    vRapida = "         "
                 else:
                     vRapida = str(i['FastestTime'])
                     vRapida = self.convertirVueltas(vRapida)
@@ -280,11 +267,11 @@ class Standings(object):
                     uVuelta = self.convertirVueltas(uVuelta)
 
                 #Añadimos todos los datos del piloto al QlistWidget y mostramos por pantalla
-                item = QListWidgetItem(posicion + nombre + safety + "    " + iRating + vRapida + "    " + uVuelta)
+                item = QListWidgetItem(posicion + nombre + safety + "                       " + iRating + vRapida + "    " + uVuelta)
                 self.lwPosiciones.addItem(item)
                 
                 #Pintamos la linea del color correspondiente
-                if int(posicion) % 2:
+                if int(posicion) % 2 == 0:
                     brush = QBrush(self.blanco)
                 else:
                     brush = QBrush(self.gris)

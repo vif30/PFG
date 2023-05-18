@@ -198,7 +198,7 @@ class Fuel(object):
         self.lblFuelAtEnd.setText(_translate("MainWindow", "1.06"))
     
     ir = irsdk.IRSDK()
-    ir.startup()#test_file='datavuelta4.bin')
+    ir.startup(test_file='datavuelta4.bin')
     if ir.is_connected:
         playerID = ir['PlayerCarIdx']
         trackID = ir['WeekendInfo']['TrackID']

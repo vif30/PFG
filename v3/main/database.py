@@ -113,7 +113,7 @@ class Database(object):
         data = cursor.fetchone()
         conn.commit()
         conn.close()
-        if(data == None):
+        if(data[0] == None):
             return 0
         else:
             return data[0]
