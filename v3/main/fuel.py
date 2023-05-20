@@ -13,6 +13,7 @@ from PyQt5.QtCore import QTimer
 import irsdk, time
 import sqlite3 as sql
 from database import Database
+from iRData import iRData
 
 class Fuel(object):
     def setupUi(self, MainWindow):
@@ -249,7 +250,7 @@ class Fuel(object):
                 self.avgFuel = round(self.totalFuel / len(self.fuelCon), 2)
 
     def cargarDatosFijos(self):
-        sesion = self.getSesion()
+        sesion = iRData.getSesion()
         tTotal = self.ir['SessionInfo']['Sessions'][sesion]['SessionTime']
         if tTotal != 'unlimited':
             tTotal = tTotal.split()

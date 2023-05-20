@@ -113,10 +113,18 @@ class Database(object):
         data = cursor.fetchone()
         conn.commit()
         conn.close()
-        if(data[0] == None):
+        if(data == None or data[0] == None):
             return 0
         else:
             return data[0]
+    #Método para actualizar el tiempo de la bbdd
+    def updateVueltaRapidaDB(trackID, carID, vuelta):
+        conn = sql.connect("C:/Users/izqui/Documents/GitHub/PFG/v3/data/iRacing.db")
+        cursor = conn.cursor()
+        query = f"UPDATE VueltaRapida SET Tiempo = {vuelta} WHERE IDCircuito = {trackID} AND IDVehiculo = {carID}"
+        cursor.execute(query)
+        conn.commit()
+        conn.close()
     
 
 if __name__ == "__main__":
