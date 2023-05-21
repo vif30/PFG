@@ -9,11 +9,9 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QListWidget, QListWidgetItem, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtGui import QColor, QBrush
 from PyQt5.QtCore import QTimer, Qt
-import irsdk, operator
-import sqlite3 as sql
 from database import Database
 from iRData import iRData
 
@@ -148,8 +146,6 @@ class Standings(object):
 
     gris = QColor(189, 195, 199)  # Color gris
     blanco = QColor(236, 240, 241)  # Color blanco
-    ir = iRData.ir
-
     
     #Metodo para cargar los datos que son fijos durante toda la carrera
     def cargarDatosFijos(self):
@@ -160,12 +156,12 @@ class Standings(object):
         if Database.getCircuitoDB(iRData.trackID) != 0:  #Buscamos el nombre del circuito en la bbdd
             self.lblCircuito.setText(Database.getCircuitoDB(iRData.trackID))
         else:
-            Database.insertNuevoCircuito(self.trackID, self.ir['WeekendInfo']['TrackDisplayName'], self.ir['WeekendInfo']['TrackCountry'], self.ir['WeekendInfo']['TrackCity'], self.ir['WeekendInfo']['TrackLengthOfficial'], self.ir['WeekendInfo']['TrackConfigName'])
+            Database.insertNuevoCircuitoDB(iRData.trackID, iRData.ir['WeekendInfo']['TrackDisplayName'], iRData.ir['WeekendInfo']['TrackCountry'], iRData.ir['WeekendInfo']['TrackCity'], iRData.ir['WeekendInfo']['TrackLengthOfficial'], iRData.ir['WeekendInfo']['TrackConfigName'])
             self.lblCircuito.setText(Database.getCircuitoDB( self.trackID))
 
         #Calculo del SOF de la partida, esto solo se calcula cuando la sesion es del tipo RACE
-        if len(self.ir['SessionInfo']['Sessions']) == 3:
-            participantes = self.ir['DriverInfo']['Drivers']
+        if len(iRData.ir['SessionInfo']['Sessions']) == 3:
+            participantes = iRData.ir['DriverInfo']['Drivers']
             totaliR = 0
             for i in participantes:
                 if i['CarIdx'] == 0:
@@ -194,15 +190,15 @@ class Standings(object):
 
     #Metodo para cargar los datos varian durante la carrera
     def cargarDatosVariables(self):
-        if not self.ir.is_connected:
+        if not iRData.ir.is_connected:
             if self.playerFastLap != 0:
-                if self.playerFastLap < Database.getVueltaRapidaDB(self.trackID, self.carID) or Database.getVueltaRapidaDB(self.trackID, self.carID) == 0:
-                    Database.updateVueltaRapidaDB(self.trackID, self.carID, self.playerFastLap)
+                if self.playerFastLap < Database.getVueltaRapidaDB(iRData.trackID, iRData.carID) or Database.getVueltaRapidaDB(iRData.trackID, iRData.carID) == 0:
+                    Database.updateVueltaRapidaDB(iRData.trackID, iRData.carID, self.playerFastLap)
             sys.exit()
         self.lwPosiciones.clear()
         sesionName = ""
     # Obtén los datos de la posición de los participantes comprobando en que sesion estamos
-        sesion = iRData.getSesion(self)
+        sesion = iRData.getSesion()
         participantes = iRData.getParticipantes(self)
         if sesion == 2:
             sesionName = "Race: "
@@ -212,13 +208,13 @@ class Standings(object):
             sesionName = "Practice: "
        
         #Tiempo de sesion
-        tTotal = self.ir['SessionInfo']['Sessions'][sesion]['SessionTime']
+        tTotal = iRData.ir['SessionInfo']['Sessions'][sesion]['SessionTime']
         tTotal = tTotal.split()
         tTotalFrm = self.convertirTiempo(tTotal[0])
         tTotal = float(tTotal[0])
         
-        tTranscurrido = self.convertirTiempo(self.ir['SessionTime'])
-        tRestante = self.convertirTiempo(self.ir['SessionTimeRemain'])
+        tTranscurrido = self.convertirTiempo(iRData.ir['SessionTime'])
+        tRestante = self.convertirTiempo(iRData.ir['SessionTimeRemain'])
         if tRestante == '-1:59':
             self.lblTiempo.setText(sesionName + str(tTranscurrido) + " / " + str(tTotalFrm))
         else:
@@ -230,7 +226,7 @@ class Standings(object):
                 vRapida = Database.getVueltaRapidaDB(self.trackID, self.carID)
                 vTotales = tTotal/vRapida
             else:
-                estLap = self.ir['DriverInfo']['Drivers'][iRData.playerID]['CarClassEstLapTime']
+                estLap = iRData.ir['DriverInfo']['Drivers'][iRData.playerID]['CarClassEstLapTime']
                 vTotales = tTotal/estLap
             self.lblVueltas.setText("Lap: " + str(iRData.lap))
         else:
@@ -255,15 +251,15 @@ class Standings(object):
                     posicion += " "
 
                 #Añadimos el nombre del piloto, en caso de no tener nombre abreviado, añadimos el nombre completo
-                nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['AbbrevName']
+                nombre = iRData.ir['DriverInfo']['Drivers'][i['CarIdx']]['AbbrevName']
                 if nombre == "":
-                    nombre = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['UserName']
+                    nombre = iRData.ir['DriverInfo']['Drivers'][i['CarIdx']]['UserName']
                 
                 #Añadimos espeacios en blanco detras
                 while len(nombre) < 20:
                     nombre += " "
-                safety = self.ir['DriverInfo']['Drivers'][i['CarIdx']]['LicString']
-                iRating = str(self.ir['DriverInfo']['Drivers'][i['CarIdx']]['IRating'])
+                safety = iRData.ir['DriverInfo']['Drivers'][i['CarIdx']]['LicString']
+                iRating = str(iRData.ir['DriverInfo']['Drivers'][i['CarIdx']]['IRating'])
                 #Añadimos espeacios en blanco detras
                 while len(iRating) < 8:
                     iRating += " "
@@ -301,7 +297,7 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Standings()
-    if ui.ir.is_connected:
+    if iRData.ir.is_connected:
         ui.setupUi(MainWindow)
         ui.cargarDatosFijos()
         ui.cargarDatosVariables()

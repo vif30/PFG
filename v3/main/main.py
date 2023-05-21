@@ -11,8 +11,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTimer
 from standings import Standings
-from fuel import Fuel
-import irsdk, time
+
+from iRData import iRData
 
 class Main(object):
     def setupUi(self, MainWindow):
@@ -27,7 +27,6 @@ class Main(object):
         font.setPointSize(14)
         self.btnFuel.setFont(font)
         self.btnFuel.setObjectName("btnFuel")
-        self.btnFuel.clicked.connect(self.openFuel)
         self.lblBienvenida = QtWidgets.QLabel(self.centralwidget)
         self.lblBienvenida.setGeometry(QtCore.QRect(170, 40, 481, 91))
         font = QtGui.QFont()
@@ -42,7 +41,6 @@ class Main(object):
         font.setPointSize(14)
         self.btnStandings.setFont(font)
         self.btnStandings.setObjectName("btnStandings")
-        self.btnStandings.clicked.connect(self.openStandings)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -73,23 +71,23 @@ class Main(object):
         self.ventana.show()
     
     def openFuel(self):
+        from fuel import Fuel
         self.ventana2 = QtWidgets.QMainWindow()
         self.ui2 = Fuel()
         self.ui2.setupUi(self.ventana2)
         self.ventana2.show()
 
     def checkiRacing(self):
-        ir = irsdk.IRSDK()
-        ir.startup(test_file='datavuelta4.bin')
-        if ir.is_connected:
+        if iRData.ir.is_connected:
             self.btnFuel.setStyleSheet('background-color: green')
+            self.btnFuel.clicked.connect(self.openFuel)
             self.btnStandings.setStyleSheet('background-color: green')
+            self.btnStandings.clicked.connect(self.openStandings)
         else:
             self.btnFuel.setStyleSheet('background-color: red')
             self.btnStandings.setStyleSheet('background-color: red')
-
-        ir.shutdown()
-    
+        iRData.ir.startup()
+  
 
 
 if __name__ == "__main__":

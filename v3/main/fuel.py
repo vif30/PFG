@@ -10,8 +10,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTimer
-import irsdk, time
-import sqlite3 as sql
 from database import Database
 from iRData import iRData
 
@@ -198,30 +196,14 @@ class Fuel(object):
         self.label_11.setText(_translate("MainWindow", "Fuel at End"))
         self.lblFuelAtEnd.setText(_translate("MainWindow", "1.06"))
     
-    ir = irsdk.IRSDK()
-    ir.startup(test_file='datavuelta4.bin')
-    if ir.is_connected:
-        playerID = ir['PlayerCarIdx']
-        trackID = ir['WeekendInfo']['TrackID']
-        carID = ir['DriverInfo']['Drivers'][playerID]['CarID']
-        vuelta = ir['Lap']
-        fuelLevel1 = ir['FuelLevel']
-        while fuelLevel1 == 0:
-            fuelLevel1 = ir['FuelLevel']
+    if iRData.ir.is_connected:
+        vuelta = iRData.ir['Lap']
+        fuelLevel1 = iRData.ir['FuelLevel']
         fuelCon = []
         avgFuel = 0
         vTotales = 0
         totalFuel = 0
         lastLapPit = False
-
-    #Metodo para obtener el tipo de sesion en la que estamos (practica, clasificacion o carrera)
-    def getSesion(self):
-        if len(self.ir['SessionInfo']['Sessions']) == 3:
-            return 2
-        elif len(self.ir['SessionInfo']['Sessions']) == 2:
-            return 1
-        elif len(self.ir['SessionInfo']['Sessions']) == 1:
-            return 0
 
     def calcularRefuel(self, fuelLevel, fuelConsuption, totalLaps, currentLap):
         if fuelConsuption > 0:
@@ -235,66 +217,66 @@ class Fuel(object):
         else: 
             return 0
 
-    def getConsumo(self):
-        currLap = self.ir['Lap']
+    def calcularConsumo(self):
+        currLap = iRData.ir['Lap']
         if self.vuelta != currLap:
             if self.lastLapPit:
                 self.lastLapPit = False
             else:
-                consumoVuelta = self.fuelLevel1 - self.ir['FuelLevel']
+                consumoVuelta = self.fuelLevel1 - iRData.ir['FuelLevel']
                 self.fuelCon.append(consumoVuelta)
                 self.fuelCon.sort()
-                self.vuelta = self.ir['Lap']
-                self.fuelLevel1 = self.ir['FuelLevel']
+                self.vuelta = iRData.ir['Lap']
+                self.fuelLevel1 = iRData.ir['FuelLevel']
                 self.totalFuel = self.totalFuel + consumoVuelta
                 self.avgFuel = round(self.totalFuel / len(self.fuelCon), 2)
 
     def cargarDatosFijos(self):
-        sesion = iRData.getSesion()
-        tTotal = self.ir['SessionInfo']['Sessions'][sesion]['SessionTime']
+        tTotal = iRData.ir['SessionInfo']['Sessions'][iRData.getSesion()]['SessionTime']
         if tTotal != 'unlimited':
             tTotal = tTotal.split()
             tTotal = float(tTotal[0])
-        self.avgFuel = Database.getAVGFuelDB(self.trackID, self.carID)
+        self.avgFuel = Database.getAVGFuelDB(iRData.trackID, iRData.carID)
 
-        if self.ir['SessionInfo']['Sessions'][sesion]['SessionLaps'] ==  'unlimited' and self.ir['SessionInfo']['Sessions'][sesion]['SessionType'] == 'Race':
-            if Database.getVueltaRapidaDB(self.trackID, self.carID) != 0:
-                vRapida = Database.getVueltaRapidaDB(self.trackID, self.carID)
+        if iRData.ir['SessionInfo']['Sessions'][iRData.getSesion()]['SessionLaps'] ==  'unlimited' and iRData.ir['SessionInfo']['Sessions'][iRData.getSesion()]['SessionType'] == 'Race':
+            if Database.getVueltaRapidaDB(iRData.trackID, iRData.carID) != 0:
+                vRapida = Database.getVueltaRapidaDB(iRData.trackID, iRData.carID)
                 self.vTotales = tTotal/vRapida
             else:
-                estLap = self.ir['DriverInfo']['Drivers'][self.playerID]['CarClassEstLapTime']
+                estLap = iRData.ir['DriverInfo']['Drivers'][iRData.playerID]['CarClassEstLapTime']
                 self.vTotales = tTotal/estLap
-        elif self.ir['SessionInfo']['Sessions'][sesion]['SessionType'] == 'Race':
-            self.vTotales = self.ir['SessionInfo']['Sessions'][sesion]['SessionLaps']
+        elif iRData.ir['SessionInfo']['Sessions'][iRData.getSesion()]['SessionType'] == 'Race':
+            self.vTotales = iRData.ir['SessionInfo']['Sessions'][iRData.getSesion(self)]['SessionLaps']
         self.lblLaps.setText("{0:.0f}".format((self.vTotales)))
 
     def cargarDatosVariables(self):
-        if not self.ir.is_connected:
+        if not iRData.ir.is_connected:
             if len(self.fuelCon) != 0:
-                if self.ir['SessionLapsRemainEx'] == 0 or not self.ir.is_connected:
+                if iRData.ir['SessionLapsRemainEx'] == 0 or not iRData.ir.is_connected:
                     self.avgFuel = round(self.totalFuel / len(self.fuelCon), 2)
-                    if Database.getAVGFuelDB(self.trackID, self.carID) != 0:
-                        Database.updateAvgFuel(self.avgFuel, self.trackID, self.carID)
+                    if Database.getAVGFuelDB(iRData.trackID, iRData.carID) != 0:
+                        Database.updateAvgFuelDB(self.avgFuel, iRData.trackID, iRData.carID)
                     else:
-                        Database.insertNewAvgFuel(self.trackID, self.carID, self.avgFuel)
+                        Database.insertNewAvgFuelDB(iRData.trackID, iRData.carID, self.avgFuel)
             sys.exit()
+        if self.fuelLevel1 == 0 :
+            self.fuelLevel1 = iRData.ir['FuelLevel']
         self.lblLaps.setText(str(self.vuelta))
-        fuelLevel = self.ir['FuelLevel']
-        while fuelLevel == 0:
-            fuelLevel = self.ir['FuelLevel']
-        if self.ir['PlayerCarInPitStall']:
+        fuelLevel2 = iRData.ir['FuelLevel']
+        if fuelLevel2 == 0:
+            fuelLevel2 = iRData.ir['FuelLevel']
+        if iRData.ir['PlayerCarInPitStall']:
             self.lastLapPit = True
-        print(self.lastLapPit)
-        self.getConsumo()
+        self.calcularConsumo()
         #Mostramos combustible actual
-        self.lblFuelLevel.setText("{0:.2f}".format((fuelLevel)))
+        self.lblFuelLevel.setText("{0:.2f}".format((fuelLevel2)))
         self.fuelCon.sort()
         self.lblAverage.setText("{0:.2f}".format((self.avgFuel)))
 
-        refuel = self.calcularRefuel(fuelLevel, self.avgFuel, self.vTotales, self.ir['Lap'])
+        refuel = self.calcularRefuel(fuelLevel2, self.avgFuel, self.vTotales, iRData.ir['Lap'])
         if refuel != 0:
             self.lblRefuel.setText("{0:.2f}".format((refuel)))
-            vRestante = self.vTotales - self.ir['Lap']
+            vRestante = self.vTotales - iRData.ir['Lap']
             sobrante = refuel - (vRestante * self.avgFuel)
             self.lblFuelAtEnd.setText(str(sobrante))
         else:
@@ -307,7 +289,7 @@ class Fuel(object):
             self.lblRemaining.setText("--:--")
         else:   #Si encuentra valor, mostramos por pantalla 
             self.lblAverage.setText(str(self.avgFuel))
-            remainingLaps = fuelLevel / self.avgFuel
+            remainingLaps = fuelLevel2 / self.avgFuel
 
             self.lblRemaining.setText("{0:.2f}".format((remainingLaps)))
 
@@ -317,7 +299,7 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Fuel()
-    if ui.ir.is_connected:
+    if iRData.ir.is_connected:
         ui.setupUi(MainWindow)
         ui.cargarDatosFijos()
         ui.cargarDatosVariables()

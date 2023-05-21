@@ -171,7 +171,7 @@ class Standings(object):
         if Database.getCircuitoDB(self.trackID) != 0:  #Buscamos el nombre del circuito en la bbdd
             self.lblCircuito.setText(Database.getCircuitoDB(self.trackID))
         else:
-            Database.insertNuevoCircuito(self.trackID, self.ir['WeekendInfo']['TrackDisplayName'], self.ir['WeekendInfo']['TrackCountry'], self.ir['WeekendInfo']['TrackCity'], self.ir['WeekendInfo']['TrackLengthOfficial'], self.ir['WeekendInfo']['TrackConfigName'])
+            Database.insertNuevoCircuitoDB(self.trackID, self.ir['WeekendInfo']['TrackDisplayName'], self.ir['WeekendInfo']['TrackCountry'], self.ir['WeekendInfo']['TrackCity'], self.ir['WeekendInfo']['TrackLengthOfficial'], self.ir['WeekendInfo']['TrackConfigName'])
             self.lblCircuito.setText(Database.getCircuitoDB( self.trackID))
 
         #Calculo del SOF de la partida, esto solo se calcula cuando la sesion es del tipo RACE
