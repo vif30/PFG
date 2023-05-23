@@ -153,14 +153,17 @@ class Standings(object):
             self.lblSerie.setText(Database.getSerieDB(iRData.seriesID))
         if Database.getCarDB(iRData.carID) != 0:       #Buscamos el nombre del coche en la bbdd
             self.lblCar.setText(Database.getCarDB(iRData.carID))
+        else:   #si no lo encontramos, lo insertamos
+            Database.insertNuevoVehiculoDB(iRData.carID, iRData.carName)
+            self.lblCar.setText(Database.getCarDB(iRData.carID))
         if Database.getCircuitoDB(iRData.trackID) != 0:  #Buscamos el nombre del circuito en la bbdd
             self.lblCircuito.setText(Database.getCircuitoDB(iRData.trackID))
-        else:
-            Database.insertNuevoCircuitoDB(iRData.trackID, iRData.ir['WeekendInfo']['TrackDisplayName'], iRData.ir['WeekendInfo']['TrackCountry'], iRData.ir['WeekendInfo']['TrackCity'], iRData.ir['WeekendInfo']['TrackLengthOfficial'], iRData.ir['WeekendInfo']['TrackConfigName'])
-            self.lblCircuito.setText(Database.getCircuitoDB( self.trackID))
+        else:   #si no lo encontramos, lo insertamos
+            Database.insertNuevoCircuitoDB(iRData.trackID, iRData.trackName, iRData.trackCountry, iRData.trackCity, iRData.trackLength, iRData.trackVariante)
+            self.lblCircuito.setText(Database.getCircuitoDB( iRData.trackID))
 
         #Calculo del SOF de la partida, esto solo se calcula cuando la sesion es del tipo RACE
-        if len(iRData.ir['SessionInfo']['Sessions']) == 3:
+        if len(iRData.sessions) == 3:
             participantes = iRData.ir['DriverInfo']['Drivers']
             totaliR = 0
             for i in participantes:

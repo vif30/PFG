@@ -1,6 +1,5 @@
         CREATE TABLE Vehiculos (
         IDVehiculo INTEGER NOT NULL PRIMARY KEY,
-        Marca TEXT,
         Modelo TEXT,
         Categoria TEXT,
         Legacy INTEGER,
@@ -41,13 +40,13 @@
         (445, 'Fuji International Speedway', 'Japan', 'Oyama, Sunto District, Shizuoka', '4.48 km', 'No chicane', 0, 1)
 
         INSERT INTO Vehiculos VALUES
-        (1, 'Skip Barber', 'Formula 2000', 'Skip Barber', 0, 1),
-        (67, 'Mazda', 'MX-5 Cup', 'MX-5 Cup', 0, 1),
-        (112, 'Audi', 'RS3 LMS', 'TCR', 0, 1),
-        (119, 'Porsche', '718 Cayman GT4 Clubsport MR', 'GT4', 0, 1),
-        (144, 'Ferrari', '488 GT3 Evo 2020', 'GT3', 0, 1),
-        (148, 'iRacing', 'iR-04', 'F4', 0, 1),
-        (160, 'Toyota', 'GR86', 'GR86', 0, 1)
+        (1, 'Skip Barber Formula 2000', 'Skip Barber', 0, 1),
+        (67, 'Mazda MX-5 Cup', 'MX-5 Cup', 0, 1),
+        (112, 'Audi RS3 LMS', 'TCR', 0, 1),
+        (119, 'Porsche 718 Cayman GT4 Clubsport MR', 'GT4', 0, 1),
+        (144, 'Ferrari 488 GT3 Evo 2020', 'GT3', 0, 1),
+        (148, 'iRacing iR-04', 'F4', 0, 1),
+        (160, 'Toyota GR86', 'GR86', 0, 1)
 
         INSERT INTO VueltaRapida VALUES
         (1, 47, 144, 86.375, 2.19),

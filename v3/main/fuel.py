@@ -209,11 +209,15 @@ class Fuel(object):
         if fuelConsuption > 0:
             autonomia = fuelLevel / fuelConsuption
             vRestantes = totalLaps - currentLap
+            maxAutonomia = iRData.ir['DriverInfo']['DriverCarFuelMaxLtr'] * fuelConsuption
             if autonomia > vRestantes:
                 return 0
             else:
                 refuel = vRestantes * fuelConsuption + 1.5
-                return refuel
+                if refuel > maxAutonomia:
+                    return 'max'
+                else:
+                    return refuel
         else: 
             return 0
 
@@ -237,7 +241,6 @@ class Fuel(object):
             tTotal = tTotal.split()
             tTotal = float(tTotal[0])
         self.avgFuel = Database.getAVGFuelDB(iRData.trackID, iRData.carID)
-
         if iRData.ir['SessionInfo']['Sessions'][iRData.getSesion()]['SessionLaps'] ==  'unlimited' and iRData.ir['SessionInfo']['Sessions'][iRData.getSesion()]['SessionType'] == 'Race':
             if Database.getVueltaRapidaDB(iRData.trackID, iRData.carID) != 0:
                 vRapida = Database.getVueltaRapidaDB(iRData.trackID, iRData.carID)
@@ -274,7 +277,10 @@ class Fuel(object):
         self.lblAverage.setText("{0:.2f}".format((self.avgFuel)))
 
         refuel = self.calcularRefuel(fuelLevel2, self.avgFuel, self.vTotales, iRData.ir['Lap'])
-        if refuel != 0:
+        if refuel == 'max':
+            self.lblRefuel.setText("Refuel to the max")
+            self.lblFuelAtEnd.setText("--:--")
+        elif refuel > 0:
             self.lblRefuel.setText("{0:.2f}".format((refuel)))
             vRestante = self.vTotales - iRData.ir['Lap']
             sobrante = refuel - (vRestante * self.avgFuel)

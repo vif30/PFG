@@ -21,7 +21,7 @@ class Database(object):
         conn = sql.connect("C:/Users/izqui/Documents/GitHub/PFG/v3/data/iRacing.db")
         cursor = conn.cursor()
         cursor = conn.cursor()
-        query = f"SELECT Marca, Modelo FROM Vehiculos WHERE IDVehiculo = {carID}"
+        query = f"SELECT Modelo FROM Vehiculos WHERE IDVehiculo = {carID}"
         cursor.execute(query)
         data = cursor.fetchone()
         conn.commit()
@@ -29,7 +29,7 @@ class Database(object):
         if(data == None):
             return 0
         else:
-            return data[0] + " " + data[1]
+            return data[0]
     
     #Método para obtener el nombre de la Serie de la bbdd
     def getSerieDB(serieID):
@@ -78,6 +78,15 @@ class Database(object):
         conn = sql.connect("C:/Users/izqui/Documents/GitHub/PFG/v3/data/iRacing.db")
         cursor = conn.cursor()
         query = f"""INSERT INTO Circuitos (IDCircuito, Nombre, Pais, Ciudad, Longitud, Variante, Comprado) VALUES ({trackID}, '{trackName}', '{TrackCountry}', '{TrackCity}', '{TrackLengthOfficial}', '{TrackConfigName}', 1)"""
+        cursor.execute(query)
+        conn.commit()
+        conn.close()
+
+    #Método para insertar un nuevo circuito en la bbdd
+    def insertNuevoVehiculoDB(carID, carName):
+        conn = sql.connect("C:/Users/izqui/Documents/GitHub/PFG/v3/data/iRacing.db")
+        cursor = conn.cursor()
+        query = f"""INSERT INTO Vehiculos (IDVehiculo, Modelo, Comprado) VALUES ({carID}, '{carName}', '1')"""
         cursor.execute(query)
         conn.commit()
         conn.close()
